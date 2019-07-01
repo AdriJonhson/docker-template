@@ -11,7 +11,6 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libxml2-dev \
     libgmp-dev re2c libmhash-dev libmcrypt-dev file \
-    supervisor \
     sudo
 
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/local/include/
@@ -50,7 +49,5 @@ RUN bash -c php artisan view:cache
 
 RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
 USER docker
-
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 
 EXPOSE 9000

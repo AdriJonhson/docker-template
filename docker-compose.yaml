@@ -7,6 +7,10 @@ volumes:
 networks:
   teste_network:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.2.0.0/16
 
 services:
   php:
@@ -17,15 +21,25 @@ services:
       - teste_network
     volumes:
       - ./:/var/www/
-      - ./docker/configs/supervisor/laravel_worker.conf:/etc/supervisor/conf.d/laravel_worker.conf:ro
 
-
+  supervisor:
+    build: ./docker/supervisor
+    container_name: teste_supervisor
+    working_dir: /var/www/
+    networks:
+      - teste_network
+    volumes:
+      - ./:/var/www/
+      - ./docker/configs/supervisor:/etc/supervisor/conf.d/
+    depends_on:
+      - php
+      - nginx
 
   nginx:
     build: ./docker/nginx
     container_name: teste_nginx
     working_dir: /var/www/
-    networks: 
+    networks:
       - teste_network
     ports:
       - "80:80"
@@ -38,7 +52,8 @@ services:
     build: ./docker/mysql
     container_name: teste_mysql
     networks: 
-      - teste_network
+        teste_network:
+          ipv4_address: 10.2.0.5
     environment:
       - MYSQL_DATABASE=teste
       - MYSQL_ROOT_PASSWORD=secret
@@ -46,13 +61,6 @@ services:
       - MYSQL_PASSWORD=secret
     volumes:
       - teste_mysql_data:/var/lib/mysql
-
-  # python:
-  #   image: python:3.6
-  #   container_name: teste_python
-  #   working_dir: /var/www/
-  #   networks: 
-  #     - teste_network
 
   mailhog:
     build: ./docker/mailhog

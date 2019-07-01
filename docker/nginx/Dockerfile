@@ -2,8 +2,6 @@ FROM nginx:1.16-alpine
 
 RUN apk add --no-cache openssl
 
-RUN apk add sudo
-
 RUN mkdir /etc/nginx/ssl 2> /dev/null
 
 RUN openssl genrsa -out "/etc/nginx/ssl/app.key" 2048 \
